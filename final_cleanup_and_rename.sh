@@ -13,7 +13,7 @@ for f in *.ipynb; do
   fi
 done
 
-# 2) Rename the main examples to final names
+# 2) Rename the main files
 for old in "Example 4.1.ipynb" "Example 4.2.ipynb" "Example 4.3.ipynb" "Example 4.4.ipynb"; do
   if [[ -f "$old" ]]; then
     case "$old" in
@@ -48,7 +48,13 @@ for old in "Example 4.1IP2.ipynb" "Example 4.3IP2.ipynb"; do
   fi
 done
 
-# 4) Rename all 4.1 and 4.3 L1/L12 to ExampleFP
+# 4) Normalize the 4.2 duplicate
+if [[ -f "Example 4.2-2.ipynb" ]]; then
+  mv -- "Example 4.2-2.ipynb" "ExampleIP1 4.2L1.ipynb"
+  echo "Renamed: Example 4.2-2.ipynb -> ExampleIP1 4.2L1.ipynb"
+fi
+
+# 5) Rename all 4.1 and 4.3 L1/L12 to ExampleFP
 for old in "Example 4.1L1.ipynb" "Example 4.1L12.ipynb" "Example 4.3L1.ipynb" "Example 4.3L12.ipynb"; do
   if [[ -f "$old" ]]; then
     new="${old/Example /ExampleFP }"
@@ -57,19 +63,10 @@ for old in "Example 4.1L1.ipynb" "Example 4.1L12.ipynb" "Example 4.3L1.ipynb" "E
   fi
 done
 
-# 5) Rename all 4.2 and 4.4 L1/L12 to ExampleIP1
+# 6) Rename all 4.2 and 4.4 L1/L12 to ExampleIP1
 for old in "Example 4.2L1.ipynb" "Example 4.2L12.ipynb" "Example 4.4L1.ipynb" "Example 4.4L12.ipynb"; do
   if [[ -f "$old" ]]; then
     new="${old/Example /ExampleIP1 }"
-    mv -- "$old" "$new"
-    echo "Renamed: $old -> $new"
-  fi
-done
-
-# 6) Rename 4.1IP2 L1/L12 and 4.3IP2 L1/L12 to their final names
-for old in "Example 4.1IP2L1.ipynb" "Example 4.1IP2L12.ipynb" "Example 4.3IP2L1.ipynb" "Example 4.3IP2L12.ipynb"; do
-  if [[ -f "$old" ]]; then
-    new="${old/Example /Example }"
     mv -- "$old" "$new"
     echo "Renamed: $old -> $new"
   fi
@@ -87,7 +84,6 @@ keep=(
   "ExampleIP1 4.2L2.ipynb"
   "ExampleIP1 4.2L1.ipynb"
   "ExampleIP1 4.2L12.ipynb"
-  "Example 4.2-2.ipynb"
 
   "ExampleFP 4.3L2.ipynb"
   "ExampleFP 4.3L1.ipynb"
@@ -114,5 +110,5 @@ for f in *.ipynb; do
   fi
 done
 
-echo "Final notebook files:"
+echo "Final files:"
 ls -1 | sort
