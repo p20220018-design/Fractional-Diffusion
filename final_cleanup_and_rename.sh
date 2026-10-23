@@ -13,7 +13,7 @@ for f in *.ipynb; do
   fi
 done
 
-# 2) Rename the main files
+# 2) Rename main example files
 for old in "Example 4.1.ipynb" "Example 4.2.ipynb" "Example 4.3.ipynb" "Example 4.4.ipynb"; do
   if [[ -f "$old" ]]; then
     case "$old" in
@@ -39,7 +39,7 @@ for old in "Example 4.1.ipynb" "Example 4.2.ipynb" "Example 4.3.ipynb" "Example 
   fi
 done
 
-# 3) Rename IP2 main files to L2
+# 3) Rename IP2 files
 for old in "Example 4.1IP2.ipynb" "Example 4.3IP2.ipynb"; do
   if [[ -f "$old" ]]; then
     new="${old/.ipynb/L2.ipynb}"
@@ -54,25 +54,36 @@ if [[ -f "Example 4.2-2.ipynb" ]]; then
   echo "Renamed: Example 4.2-2.ipynb -> ExampleIP1 4.2L1.ipynb"
 fi
 
-# 5) Rename 4.1 and 4.3 L1/L12 to ExampleFP
-for old in "Example 4.1L1.ipynb" "Example 4.1L12.ipynb" "Example 4.3L1.ipynb" "Example 4.3L12.ipynb"; do
+# 5) Rename L1 and L12 files to match the family naming
+for old in "Example 4.1L1.ipynb" "Example 4.1L12.ipynb" \
+           "Example 4.3L1.ipynb" "Example 4.3L12.ipynb" \
+           "Example 4.2L1.ipynb" "Example 4.2L12.ipynb" \
+           "Example 4.4L1.ipynb" "Example 4.4L12.ipynb"; do
   if [[ -f "$old" ]]; then
-    new="${old/Example /ExampleFP }"
+    case "$old" in
+      "Example 4.1L1.ipynb"|"Example 4.1L12.ipynb")
+        new="${old/Example /ExampleFP }"
+        ;;
+      "Example 4.2L1.ipynb"|"Example 4.2L12.ipynb")
+        new="${old/Example /ExampleIP1 }"
+        ;;
+      "Example 4.3L1.ipynb"|"Example 4.3L12.ipynb")
+        new="${old/Example /ExampleFP }"
+        ;;
+      "Example 4.4L1.ipynb"|"Example 4.4L12.ipynb")
+        new="${old/Example /ExampleIP1 }"
+        ;;
+      *)
+        continue
+        ;;
+    esac
+
     mv -- "$old" "$new"
     echo "Renamed: $old -> $new"
   fi
 done
 
-# 6) Rename 4.2 and 4.4 L1/L12 to ExampleIP1
-for old in "Example 4.2L1.ipynb" "Example 4.2L12.ipynb" "Example 4.4L1.ipynb" "Example 4.4L12.ipynb"; do
-  if [[ -f "$old" ]]; then
-    new="${old/Example /ExampleIP1 }"
-    mv -- "$old" "$new"
-    echo "Renamed: $old -> $new"
-  fi
-done
-
-# 7) Keep only final files and delete everything else
+# 6) Keep only the final desired files
 keep=(
   "Example 4.1IP2L2.ipynb"
   "Example 4.1IP2L1.ipynb"
