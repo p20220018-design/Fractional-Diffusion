@@ -3,109 +3,62 @@ set -euo pipefail
 
 cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 
-# 1) Remove "-revised" from any remaining notebooks
-for f in *.ipynb; do
-  [[ -e "$f" ]] || continue
-  if [[ "$f" == *"-revised.ipynb" ]]; then
-    new="${f//-revised/}"
-    mv -- "$f" "$new"
-    echo "Renamed: $f -> $new"
+rename_if_exists() {
+  src="$1"
+  dst="$2"
+  if [[ -f "$src" ]]; then
+    if [[ -e "$dst" ]]; then
+      rm -f -- "$src"
+      echo "Removed duplicate: $src"
+    else
+      mv -- "$src" "$dst"
+      echo "Renamed: $src -> $dst"
+    fi
   fi
-done
+}
 
-# 2) Rename main example files
-for old in "Example 4.1.ipynb" "Example 4.2.ipynb" "Example 4.3.ipynb" "Example 4.4.ipynb"; do
-  if [[ -f "$old" ]]; then
-    case "$old" in
-      "Example 4.1.ipynb")
-        new="ExampleFP 4.1L2.ipynb"
-        ;;
-      "Example 4.2.ipynb")
-        new="ExampleIP1 4.2L2.ipynb"
-        ;;
-      "Example 4.3.ipynb")
-        new="ExampleFP 4.3L2.ipynb"
-        ;;
-      "Example 4.4.ipynb")
-        new="ExampleIP1 4.4L2.ipynb"
-        ;;
-      *)
-        continue
-        ;;
-    esac
+rename_if_exists "Example 4.1.ipynb" "Example 4.1FPL2.ipynb"
+rename_if_exists "Example 4.1-revised.ipynb" "Example 4.1FPL2.ipynb"
+rename_if_exists "Example 4.1L1-revised.ipynb" "Example 4.1FPL1.ipynb"
+rename_if_exists "Example 4.1L12-revised.ipynb" "Example 4.1FPL12.ipynb"
+rename_if_exists "Example 4.1IP2.ipynb" "Example 4.1IP2L2.ipynb"
 
-    mv -- "$old" "$new"
-    echo "Renamed: $old -> $new"
-  fi
-done
+rename_if_exists "Example 4.2.ipynb" "Example 4.2IP1L2.ipynb"
+rename_if_exists "Example 4.2-2.ipynb" "Example 4.2IP1L1.ipynb"
+rename_if_exists "Example 4.2L1.ipynb" "Example 4.2IP1L1.ipynb"
+rename_if_exists "Example 4.2L12.ipynb" "Example 4.2IP1L12.ipynb"
 
-# 3) Rename IP2 files
-for old in "Example 4.1IP2.ipynb" "Example 4.3IP2.ipynb"; do
-  if [[ -f "$old" ]]; then
-    new="${old/.ipynb/L2.ipynb}"
-    mv -- "$old" "$new"
-    echo "Renamed: $old -> $new"
-  fi
-done
+rename_if_exists "Example 4.3.ipynb" "Example 4.3FPL2.ipynb"
+rename_if_exists "Example 4.3L1.ipynb" "Example 4.3FPL1.ipynb"
+rename_if_exists "Example 4.3L12.ipynb" "Example 4.3FPL12.ipynb"
+rename_if_exists "Example 4.3IP2.ipynb" "Example 4.3IP2L2.ipynb"
 
-# 4) Normalize the 4.2 duplicate
-if [[ -f "Example 4.2-2.ipynb" ]]; then
-  mv -- "Example 4.2-2.ipynb" "ExampleIP1 4.2L1.ipynb"
-  echo "Renamed: Example 4.2-2.ipynb -> ExampleIP1 4.2L1.ipynb"
-fi
+rename_if_exists "Example 4.4.ipynb" "Example 4.4IP1L2.ipynb"
+rename_if_exists "Example 4.4L1.ipynb" "Example 4.4IP1L1.ipynb"
+rename_if_exists "Example 4.4L12.ipynb" "Example 4.4IP1L12.ipynb"
 
-# 5) Rename L1 and L12 files to match the family naming
-for old in "Example 4.1L1.ipynb" "Example 4.1L12.ipynb" \
-           "Example 4.3L1.ipynb" "Example 4.3L12.ipynb" \
-           "Example 4.2L1.ipynb" "Example 4.2L12.ipynb" \
-           "Example 4.4L1.ipynb" "Example 4.4L12.ipynb"; do
-  if [[ -f "$old" ]]; then
-    case "$old" in
-      "Example 4.1L1.ipynb"|"Example 4.1L12.ipynb")
-        new="${old/Example /ExampleFP }"
-        ;;
-      "Example 4.2L1.ipynb"|"Example 4.2L12.ipynb")
-        new="${old/Example /ExampleIP1 }"
-        ;;
-      "Example 4.3L1.ipynb"|"Example 4.3L12.ipynb")
-        new="${old/Example /ExampleFP }"
-        ;;
-      "Example 4.4L1.ipynb"|"Example 4.4L12.ipynb")
-        new="${old/Example /ExampleIP1 }"
-        ;;
-      *)
-        continue
-        ;;
-    esac
-
-    mv -- "$old" "$new"
-    echo "Renamed: $old -> $new"
-  fi
-done
-
-# 6) Keep only the final desired files
 keep=(
+  "Example 4.1FPL2.ipynb"
+  "Example 4.1FPL1.ipynb"
+  "Example 4.1FPL12.ipynb"
   "Example 4.1IP2L2.ipynb"
   "Example 4.1IP2L1.ipynb"
   "Example 4.1IP2L12.ipynb"
-  "ExampleFP 4.1L2.ipynb"
-  "ExampleFP 4.1L1.ipynb"
-  "ExampleFP 4.1L12.ipynb"
 
-  "ExampleIP1 4.2L2.ipynb"
-  "ExampleIP1 4.2L1.ipynb"
-  "ExampleIP1 4.2L12.ipynb"
+  "Example 4.2IP1L2.ipynb"
+  "Example 4.2IP1L1.ipynb"
+  "Example 4.2IP1L12.ipynb"
 
+  "Example 4.3FPL2.ipynb"
+  "Example 4.3FPL1.ipynb"
+  "Example 4.3FPL12.ipynb"
   "Example 4.3IP2L2.ipynb"
   "Example 4.3IP2L1.ipynb"
   "Example 4.3IP2L12.ipynb"
-  "ExampleFP 4.3L2.ipynb"
-  "ExampleFP 4.3L1.ipynb"
-  "ExampleFP 4.3L12.ipynb"
 
-  "ExampleIP1 4.4L2.ipynb"
-  "ExampleIP1 4.4L1.ipynb"
-  "ExampleIP1 4.4L12.ipynb"
+  "Example 4.4IP1L2.ipynb"
+  "Example 4.4IP1L1.ipynb"
+  "Example 4.4IP1L12.ipynb"
 )
 
 declare -A keep_map=()
